@@ -1,0 +1,36 @@
+{
+    "coc.preferences.hoverTarget":"preview",
+    "coc.preferences.snippetStatusText": "Ⓢ ",
+    "coc.preferences.formatOnType": true,
+    "suggest.enablePreview": true,
+    "suggest.detailField": "preview",
+    "diagnostic.checkCurrentLine": true,
+    "explorer.keyMappings": {
+        "i":"nodePrev",
+        "k":"nodeNext",
+        "j":"gotoParent",
+        "l":"open"
+    },
+    "languageserver": {
+        "ccls": {
+            "command": "ccls",
+            "filetypes": [
+                "c", 
+                "cpp", 
+                "objc", 
+                "objcpp"
+            ],
+            "rootPatterns": [
+                ".ccls-root", 
+                "compile_commands.json"
+            ],
+            "initializationOptions": {
+                "cache": {
+                    "directory": ".ccls-cache"
+                },
+                "highlight": { "lsRanges" : true },
+                "client": { "snippetSupport": true }
+            }
+        }
+    }
+}
