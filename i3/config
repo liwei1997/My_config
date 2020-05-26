@@ -132,8 +132,6 @@ bindsym $mod+Shift+8 move container to workspace $ws8;workspace $ws8
 bindsym $mod+Shift+9 move container to workspace $ws9;workspace $ws9
 bindsym $mod+Shift+0 move container to workspace $ws10;workspace $ws10
 
-for_window [class="netease-cloud-music"] floating enable border none
-for_window [class="Pamac-manager"] floating enable$
 # reload the cossnfiguration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
