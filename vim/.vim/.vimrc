@@ -2,14 +2,13 @@
 " ====System====
 " ==============
 set nocompatible
-syntax on 
+syntax on
 syntax enable
 let &t_ut=''
 filetype on
 filetype indent on
 filetype plugin on
 filetype plugin indent on
-
 
 
 set autoindent
@@ -53,66 +52,75 @@ noremap > nzz
 exec "nohlsearch"
 
 map Q gq
+let g:mapleader = " "
 
-noremap $ J
-noremap h w
-noremap H K
+noremap j h
+noremap i k
+noremap k j
+
 noremap O D
 noremap o d
-noremap W s
-noremap w O
+
+noremap S O
 noremap s o
 noremap A I
 noremap a i
 noremap D A
 noremap d a
+
 noremap I H
 noremap K L
-noremap i k
-noremap k j
-noremap j h
 noremap J ^
 noremap L $
+noremap H K
+
 vnoremap Y :w !xclip -i -sel c<CR><CR>
-nmap <space>e :CocCommand explorer<CR>
+nmap <LEADER>e :CocCommand explorer<CR>
 
 noremap T <NOP>
 noremap t <NOP>
 noremap + <NOP>
-nnoremap [[  :<c-u>execute 'move -1-'. v:count1<cr>
-nnoremap ]]  :<c-u>execute 'move +'. v:count1<cr>
 
-inoremap <C-S>   <ESC>:w<CR>
-noremap  <C-S>   :w<CR>
-inoremap <C-Q>   <ESC>:q<CR>
-noremap  <C-Q>   :q<CR>
-noremap  <C-X>   <NOP>
-noremap  <C-w>   <NOP>
-noremap  <C-w>   <NOP>
-noremap  <C-w>   <NOP >
+noremap <h> <NOP>
 
+noremap hj <C-w>v
+noremap hk <C-w>s
+noremap hi <C-w>n
+
+
+noremap <C-i> <C-w>+
+noremap <C-k> <C-w>-
+noremap <C-j> <C-w><
+noremap <C-l> <C-w>>
+
+noremap <LEADER>w <C-w>w
+noremap <LEADER>k <C-w>k
+noremap <LEADER>i <C-w>j
+noremap <LEADER>j <C-w>h
+noremap <LEADER>l <C-w>l
 
 
 "Compile fuction
 noremap <F5> :call CompileRunGcc()<CR>
 func! CompileRunGcc()
-    exec "w"
-    if &filetype == 'c'
-        exec "!gcc -std=c99 % -Wall -g -lm -o %<"
-        exec "!time ./%<"
-    elseif &filetype == 'cpp'
-        set splitbelow
-        exec "!g++ -std=c++11 % -Wall -o %<"
-        :sp
-        :res -15
-        :term ./%<
-    elseif &filetype == 'java'
-        exec "!javac %"
-        exec "!time java %<"
-    elseif &filetype == 'sh'
-        :!time bash %
-    elseif &filetype == 'python'
-        :set splitbelow
+exec "w"
+if &filetype == 'c'
+set splitbelow
+exec "!gcc -std=c99 % -Wall -g -lm -o %<"
+exec "!time ./%<"
+elseif &filetype == 'cpp'
+set splitbelow
+exec "!g++ -std=c++11 % -Wall -o %<"
+:sp
+:res -15
+:term ./%<
+elseif &filetype == 'java'
+exec "!javac %"
+exec "!time java %<"
+elseif &filetype == 'sh'
+:!time bash %
+elseif &filetype == 'python'
+:set splitbelow
         :sp
         :term python3 %
     elseif &filetype == 'html'
@@ -126,18 +134,11 @@ endfunc
 
 
 
-map <C-n> :NERDTreeToggle<CR>
 call plug#begin('~/.vim/plugged')
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-"Plug 'luochen1990/rainbow'
-"Plug 'kana/vim-textobj-user'
-"Plug 'tpope/vim-fugitive'
-"Plug 'liuchengxu/vista.vim'
-"Plug 'easymotion/vim-easymotion'
-"Plug 'AndrewRadev/splitjoin.vim'
-"Plug ''
+Plug 'luochen1990/rainbow'
 Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
 Plug 'vim-airline/vim-airline'
 "Plug 'puremourning/vimspector', {'do': './install_gadget.py --enable-c --enable-python'}
@@ -195,4 +196,7 @@ inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <leader>rn <Plug>(coc-rename)
 autocmd CursorHold * silent call CocActionAsync('highlight')
