@@ -21,6 +21,9 @@ set number
 set relativenumber
 set ruler
 set hidden
+set nobackup
+set nowritebackup
+set cmdheight=2
 set shortmess+=c
 set signcolumn=yes
 set scrolloff=5
@@ -78,11 +81,9 @@ noremap T <NOP>
 noremap t <NOP>
 noremap + <NOP>
 
-noremap <h> <NOP>
-
-noremap hj <C-w>v
+noremap hl <C-w>v
 noremap hk <C-w>s
-noremap hi <C-w>n
+noremap hn <C-w>n
 
 
 noremap <C-i> <C-w>+
@@ -91,49 +92,14 @@ noremap <C-j> <C-w><
 noremap <C-l> <C-w>>
 
 noremap <LEADER>w <C-w>w
-noremap <LEADER>k <C-w>k
-noremap <LEADER>i <C-w>j
+noremap <LEADER>i <C-w>k
+noremap <LEADER>k <C-w>j
 noremap <LEADER>j <C-w>h
 noremap <LEADER>l <C-w>l
 
-
-"Compile fuction
-noremap <F5> :call CompileRunGcc()<CR>
-func! CompileRunGcc()
-exec "w"
-if &filetype == 'c'
-set splitbelow
-exec "!gcc -std=c99 % -Wall -g -lm -o %<"
-exec "!time ./%<"
-elseif &filetype == 'cpp'
-set splitbelow
-exec "!g++ -std=c++11 % -Wall -o %<"
-:sp
-:res -15
-:term ./%<
-elseif &filetype == 'java'
-exec "!javac %"
-exec "!time java %<"
-elseif &filetype == 'sh'
-:!time bash %
-elseif &filetype == 'python'
-:set splitbelow
-        :sp
-        :term python3 %
-    elseif &filetype == 'html'
-        silent! exec "!".g:mkdp_browser."% &"
-    elseif &filetype == 'markdown'
-        exec "MarkdownPreview"
-    endif
-endfunc
-
-
-
-
-
 call plug#begin('~/.vim/plugged')
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+"Plug 'SirVer/ultisnips'
+"Plug 'honza/vim-snippets'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'luochen1990/rainbow'
 Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
@@ -143,13 +109,18 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'arcticicestudio/nord-vim'
 Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-surround'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
+Plug 'skywind3000/asynctasks.vim'
+Plug 'skywind3000/asyncrun.vim'
 call plug#end()
 colorscheme nord
 
-
+let g:asyncrun_open = 6
+let g:asynctasks_term_pos = 'bottom'
+let g:asynctasks_term_rows = 8    " set height for the horizontal terminal split
+let g:asynctasks_term_cols = 80    " set width for vertical terminal split
+noremap <silent><f4> :AsyncTask file-build<cr>
+noremap <silent><f5> :AsyncTask file-run<cr>
 
 "=============
 "======MarkDown
@@ -174,26 +145,59 @@ inoreabbrev <expr> __
 "====Vimspector====
 "==================
 "let g:vimspector_enable_mappings = 'HUMAN'
-"==================
-"====Ultisnips=====
-"==================
-let g:UltiSnipsExpandTrigger="<c-e>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
 
 "coc
+
+let g:coc_snippet_next = '<TAB>'
+let g:coc_snippet_prev = '<S-TAB>'
+
+
+
 let g:coc_global_extensions = [
     \ 'coc-json', 
     \ 'coc-explorer',
+    \ 'coc-snippets',
     \ ]
 
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <silent><expr> <Tab>
+            \ pumvisible() ? "\<C-n>" :
+            \ <SID>check_back_space() ? "\<Tab>" :
+            \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+
+
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gr <Plug>(coc-references)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
-nmap <leader>rn <Plug>(coc-rename)
-autocmd CursorHold * silent call CocActionAsync('highlight')
+nmap <silent> zn <Plug>(coc-rename)
+
