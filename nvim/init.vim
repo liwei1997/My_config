@@ -1,4 +1,4 @@
-" ==============
+" ===============
 " ====System====
 " ==============
 set nocompatible
@@ -98,21 +98,25 @@ noremap <LEADER>j <C-w>h
 noremap <LEADER>l <C-w>l
 
 call plug#begin('~/.vim/plugged')
-"Plug 'SirVer/ultisnips'
 "Plug 'honza/vim-snippets'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
 Plug 'luochen1990/rainbow'
-Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
+"Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 Plug 'vim-airline/vim-airline'
 "Plug 'puremourning/vimspector', {'do': './install_gadget.py --enable-c --enable-python'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'arcticicestudio/nord-vim'
 Plug 'jiangmiao/auto-pairs'
+Plug 'Chiel92/vim-autoformat'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'skywind3000/asynctasks.vim'
 Plug 'skywind3000/asyncrun.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 call plug#end()
+
 colorscheme nord
 
 let g:asyncrun_open = 6
@@ -121,11 +125,47 @@ let g:asynctasks_term_rows = 8    " set height for the horizontal terminal split
 let g:asynctasks_term_cols = 80    " set width for vertical terminal split
 noremap <silent><f4> :AsyncTask file-build<cr>
 noremap <silent><f5> :AsyncTask file-run<cr>
+"let g:formatterpath = ['/usr/bin/clang-format-10', '/usr/bin/autopep8']
+noremap <F3> :Autoformat<CR>
+au BufWrite * :Autoformat
+let g:formatdef_clangformat_google = '"clang-format-10 --style=\"{BasedOnStyle: google, IndentWidth: 4}\""'
+let g:formatters_cpp = ['clangformat_google']
+
+" Compile function
+noremap <C-r> :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+    exec "w"
+    if &filetype == 'c'
+        exec "!g++ % -o %<"
+        exec "!time ./%<"
+    elseif &filetype == 'cpp'
+        set splitbelow
+        exec "!g++ -std=c++11 % -Wall -o %<"
+        :sp
+        :res -15
+        :term ./%<
+    elseif &filetype == 'sh'
+        :!time bash %
+    elseif &filetype == 'python'
+        set splitbelow
+        :sp
+        :term python3 %
+    elseif &filetype == 'html'
+        silent! exec "!".g:mkdp_browser." % &"
+    elseif &filetype == 'markdown'
+        exec "MarkdownPreview"
+    elseif &filetype == 'javascript'
+        set splitbelow
+        :sp
+        :term export DEBUG="INFO,ERROR,WARNING"; node --trace-warnings .
+    endif
+endfunc
 
 "=============
 "======MarkDown
 "===========
-source /home/liwei/.vim/md-snippets.vim
+"" Snippets
+source /home/liwei/.config/nvim/md-snippets.vim
 
 let g:table_mode_corner='|'
 function! s:isAtStartOfLine(mapping)
@@ -149,16 +189,32 @@ inoreabbrev <expr> __
 
 "coc
 
-let g:coc_snippet_next = '<TAB>'
-let g:coc_snippet_prev = '<S-TAB>'
-
-
 
 let g:coc_global_extensions = [
-    \ 'coc-json', 
-    \ 'coc-explorer',
-    \ 'coc-snippets',
-    \ ]
+            \ 'coc-json',
+            \ 'coc-explorer',
+            \ 'coc-snippets',
+            \ 'coc-clangd',
+            \ 'coc-python',
+            \ ]
+
+" Use <C-l> for trigger snippet expand.
+imap <C-l> <Plug>(coc-snippets-expand)
+
+" Use <C-j> for select text for visual placeholder of snippet.
+vmap <C-j> <Plug>(coc-snippets-select)
+
+" Use <C-j> for jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<c-j>'
+
+" Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<c-k>'
+
+" Use <C-j> for both expand and jump (make expand higher priority.)
+imap <C-j> <Plug>(coc-snippets-expand-jump)
+
+" Use <leader>x for convert visual selected code to snippet
+xmap <leader>x  <Plug>(coc-convert-snippet)
 
 inoremap <silent><expr> <Tab>
             \ pumvisible() ? "\<C-n>" :
@@ -167,30 +223,29 @@ inoremap <silent><expr> <Tab>
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
+    if (index(['vim','help'], &filetype) >= 0)
+        execute 'h '.expand('<cword>')
+    else
+        call CocAction('doHover')
+    endif
 endfunction
-
 
 function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
 augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder.
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+    autocmd!
+    " Setup formatexpr specified filetype(s).
+    autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+    " Update signature help on jump placeholder.
+    autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
 
@@ -200,4 +255,3 @@ nmap <silent> gr <Plug>(coc-references)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> zn <Plug>(coc-rename)
-
