@@ -1,0 +1,9 @@
+{
+    "json.format.enable": true,
+    "clangd.path": "/usr/bin/clangd-10",
+    "clangd.enabled": true,
+    "clangd.semanticHighlighting": true,
+    "python.analysis.typeCheckingMode": "off",
+    "diagnostic.showUnused": false,
+    "diagnostic.level": "information"
+}
