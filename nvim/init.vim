@@ -13,6 +13,7 @@ filetype plugin indent on
 
 set autoindent
 set backspace=indent,eol,start
+set clipboard=unnamedplus
 set encoding=utf-8
 set expandtab
 set list
@@ -24,11 +25,11 @@ set hidden
 set mouse=a
 set nobackup
 set nowritebackup
-set cmdheight=2
+set cmdheight=1
 set shortmess+=c
 set signcolumn=yes
 set scrolloff=5
-set shiftwidth=4
+set shiftwidth=2
 set showmatch
 set showcmd
 set history=256
@@ -99,19 +100,20 @@ noremap <LEADER>j <C-w>h
 noremap <LEADER>l <C-w>l
 
 call plug#begin('~/.config/nvim/plugged')
-"Plug 'honza/vim-snippets'
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-"Plug 'luochen1990/rainbow'
+Plug 'luochen1990/rainbow'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
 Plug 'vim-airline/vim-airline'
+Plug 'preservim/nerdcommenter'
+Plug 'nathanaelkane/vim-indent-guides'
 "Plug 'puremourning/vimspector', {'do': './install_gadget.py --enable-c --enable-python'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'arcticicestudio/nord-vim'
 Plug 'jiangmiao/auto-pairs'
-"Plug 'Chiel92/vim-autoformat'
+Plug 'Chiel92/vim-autoformat'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'skywind3000/asynctasks.vim'
 Plug 'skywind3000/asyncrun.vim'
@@ -128,6 +130,9 @@ let g:asynctasks_term_rows = 8    " set height for the horizontal terminal split
 let g:asynctasks_term_cols = 80    " set width for vertical terminal split
 noremap <silent><f4> :AsyncTask file-build<cr>
 noremap <silent><f5> :AsyncTask file-run<cr>
+
+
+let g:vim_markdown_folding_disabled = 1
 
 " Autoformat
 let g:formatterpath = ['/usr/bin/clang-format-10', '/home/liwei/.local/bin/black']
@@ -190,21 +195,38 @@ let g:instant_markdown_mathjax = 1
 let g:instant_markdown_autoscroll = 0
 "let g:instant_markdown_port = 8888
 let g:instant_markdown_python = 1
-
-let g:table_mode_corner='|'
+"MarkDown table  mode 
 function! s:isAtStartOfLine(mapping)
-    let text_before_cursor = getline('.')[0 : col('.')-1]
-    let mapping_pattern = '\V' . escape(a:mapping, '\')
-    let comment_pattern = '\V' . escape(substitute(&l:commentstring, '%s.*$', '', ''), '\')
-    return (text_before_cursor =~? '^' . ('\v(' . comment_pattern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
+  let text_before_cursor = getline('.')[0 : col('.')-1]
+  let mapping_pattern = '\V' . escape(a:mapping, '\')
+  let comment_pattern = '\V' . escape(substitute(&l:commentstring, '%s.*$', '', ''), '\')
+  return (text_before_cursor =~? '^' . ('\v(' . comment_pattern . '\v)?') . '\s*\v' . mapping_pattern . '\v$')
 endfunction
 
 inoreabbrev <expr> <bar><bar>
-            \ <SID>isAtStartOfLine('\|\|') ?
-            \'<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
+          \ <SID>isAtStartOfLine('\|\|') ?
+          \ '<c-o>:TableModeEnable<cr><bar><space><bar><left><left>' : '<bar><bar>'
 inoreabbrev <expr> __
-            \ <SID>isAtStartOfLine('__') ?
-            \ '<c-o>:silent! TableModeDisable<cr>' : '__'
-
-
+          \ <SID>isAtStartOfLine('__') ?
+          \ '<c-o>:silent! TableModeDisable<cr>' : '__'
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
+"
 source /home/liwei/.config/nvim/coc.vim
+
+
+"indet-guides
+"
+let g:indent_guides_enable_on_vim_startup = 1
