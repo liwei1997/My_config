@@ -4,5 +4,7 @@
     "clangd.semanticHighlighting": true,
     "clangd.compilationDatabasePath": "",
     "clangd.fallbackFlags": [],
-    "vetur.experimental.templateInterpolationService": true
+    "python.pythonPath": "python3",
+    "python.formatting.blackPath": "black",
+    "python.linting.flake8Enabled":true
 }

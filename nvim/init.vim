@@ -77,7 +77,6 @@ noremap L $
 noremap H K
 
 vnoremap Y :w !xclip -i -sel c<CR><CR>
-nmap <LEADER>e :CocCommand explorer<CR>
 
 noremap T <NOP>
 noremap t <NOP>
@@ -101,13 +100,14 @@ noremap <LEADER>l <C-w>l
 
 call plug#begin('~/.config/nvim/plugged')
 Plug 'jackguo380/vim-lsp-cxx-highlight'
-Plug 'luochen1990/rainbow'
-Plug 'godlygeek/tabular'
+"Plug 'luochen1990/rainbow'
+"Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', {'do': 'cd app & yarn install'  }
 Plug 'vim-airline/vim-airline'
-Plug 'preservim/nerdcommenter'
+"Plug 'preservim/nerdcommenter'
 Plug 'nathanaelkane/vim-indent-guides'
+Plug 'mattn/emmet-vim'
 "Plug 'puremourning/vimspector', {'do': './install_gadget.py --enable-c --enable-python'}
 Plug 'ryanoasis/vim-devicons'
 Plug 'dhruvasagar/vim-table-mode'
@@ -122,6 +122,11 @@ Plug 'junegunn/fzf.vim'
 call plug#end()
 
 colorscheme nord
+
+let g:user_emmet_mode='a'
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+
 let g:vim_json_warnings = 0
 
 let g:asyncrun_open = 6
